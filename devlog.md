@@ -43,3 +43,29 @@ When that teller is ready, it will add its ID to a shared queue.
 The customer will pick the ID at the front of the queue.
 I'll protect the queue with a semaphore since it's a shared resource.
 I'll have the program stop after 3 customers have been helped for now.
+
+# 10-25-2026 2:33 PM
+I finished all three goals for the session.
+My first commit, I created a basic implementation for the threads then exited the program cleanly.
+I also protected the print function with a semaphore using the say function.
+My second commit, I implemented the doorbell semaphore which allowed the customer to notify the teller when they had arrived to the bank.
+My third and final commit, I implemented the teller queue which a teller would join when they were ready to handle a customer's transaction.
+The last commit also included the handling of several customers.
+
+I had a few errors during my last commit.
+I forgot a bracket at the end of a line which led to a few minutes of troubleshooting.
+Overall, it wasn't too hard to fix with debugging.
+Not too much of an error, but I forgot I was going to change each say(f"Customer {cid} [Teller 0]: message") line from a static Teller 0 to a dynamic Teller {tid}.
+I just double checked my code before committing and noticed that. 
+Doesn't necessarily change the output but I wanted to make sure that was fixed for next session.
+
+This session helped me understand how semaphores work better now that I've actually used them firsthand. 
+Each time a shared resource is used, the thread using it takes one unit from the semaphore counter if it is available.
+Otherwise, it waits.
+Then when the thread is done, it adds one unit back to the semaphore counter.
+This seems useful for future projects where resource management is essential.
+
+My code is rather simple right now since only one teller is handling multiple customers.
+Next session, I'm going to focus on multiple teller handling.
+Each teller will need a cid slot and its own doorbell most likely.
+A fixed loop will probably not work next time since the work will be divided among tellers, so I will also need to develop a solution for that.
