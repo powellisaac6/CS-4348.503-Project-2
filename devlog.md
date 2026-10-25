@@ -25,3 +25,21 @@ NOTE: I'm planning on changing how I do the devlog for this project.
 For each session, I'll do an opening entry before coding and a closing entry after coding. 
 That way I can maintain a continuous flow instead of having to split my attention between coding and writing. 
 My timestamps will reflect when I started the entry, not when I committed it.
+
+# 10-25-2026 12:09 PM
+My goals for the first session:
+
+1. Threads launch.
+2. Customers introduce themselves to the tellers.
+3. Program ends smoothly.
+
+I'll write a teller function and a customer function first.
+I need to make sure it prints in the correct format (EX: Customer 10 [Teller 0]: message).
+I'll start off with one customer meeting one teller.
+After that works, I'll scale up to several.
+I'm thinking about using a queue for the tellers.
+Each teller will have a unique ID.
+When that teller is ready, it will add its ID to a shared queue.
+The customer will pick the ID at the front of the queue.
+I'll protect the queue with a semaphore since it's a shared resource.
+I'll have the program stop after 3 customers have been helped for now.
