@@ -69,3 +69,23 @@ My code is rather simple right now since only one teller is handling multiple cu
 Next session, I'm going to focus on multiple teller handling.
 Each teller will need a cid slot and its own doorbell most likely.
 A fixed loop will probably not work next time since the work will be divided among tellers, so I will also need to develop a solution for that.
+
+# 10-26-2026 4:08 PM
+Right now my code only works for 1 teller.
+For this session I want to launch 3 tellers.
+3 tellers will not work with my current implementation.
+A new instance of curr_customer could replace the current one.
+So, I think curr_customer would be better as a list.
+Also, the wrong teller could wake if only a single doorbell is used.
+Doorbells would probably also be better as a list.
+
+The fixed loop won't work anymore because a single teller may not reach the number of people needing to be served.
+Therefore, I will need some kind of logic for the tellers to determine when to quit.
+A shared counter protected by a semaphore would be a good solution.
+That way each teller can view and update the total number of people that have been served.
+After the last customer has been served, the tellers that are still asleep will have to wake up so the program can exit.
+I have yet to figure out how I will approach that.
+I will have to see what works best when I'm coding.
+
+I'll test with 3 customers first, then 10.
+To ensure it runs properly, I'll make sure to run it several times.
