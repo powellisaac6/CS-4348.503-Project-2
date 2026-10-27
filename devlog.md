@@ -1,4 +1,4 @@
-# 10-25-2026 11:45 PM
+# 10-25-2026 11:45 AM
 These are my initial thoughts.
 The project seems to simulate a bank.
 The bank opens when 3 tellers are ready.
@@ -112,3 +112,25 @@ I tested with 3 customers, then 10 as I said I would.
 Works as intended.
 
 Next session, I'll work on fully implementing the handshake between customer and teller.
+
+# 10-27-2026 11:34 AM
+For this session, I want to work on the actual customer-teller transaction.
+The teller will ask the customer which transaction they want.
+Then, the customer will randomly give the teller either a withdrawal or deposit transaction.
+The teller will tell the customer when done.
+Lastly, the teller will mark itself available after the customer leaves.
+
+Right now the teller goes back to the teller queue straight after introducing itself.
+If I continue with this logic, a customer could be sent to a busy teller.
+That is not what I want.
+So, I will need to change the logic so the teller returns to the queue after the customer leaves.
+
+I also think I need to make a list of semaphores for each object's action since they'll be shared.
+For instance, a teller will ask the customer what their transaction is.
+So, each teller will get its own asking semaphore and share it with the current customer.
+A list tracking each teller's current transaction type should be implemented as well.
+
+I'm not quite sure how many action semaphores I'll need.
+I'll start with the asking one mentioned earlier.
+
+Again I'll test with 3 customers first, then 10, and run it multiple times to ensure it's working properly.
