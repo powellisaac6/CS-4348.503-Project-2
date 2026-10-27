@@ -1,4 +1,5 @@
 import threading
+import random
 
 # acquire = acquires one unit from the semaphore counter to do work, waits otherwise
 # release = releases one unit to the semaphore counter, allowing other threads to do work
@@ -8,9 +9,15 @@ NUM_TELLERS = 3
 
 print_protected = threading.Semaphore(1)                            # Avoid print mixing by using a semaphore
 curr_customer = [None] * NUM_TELLERS                                # Current customer being served (one slot per teller)
+curr_transaction = [None] * NUM_TELLERS
 
 # Each teller has a doorbell
 doorbells = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]    # Customer rings the doorbell to let the teller know they've arrived
+
+asking = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]
+giving = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]
+finishing = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]
+leaving = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]
 
 teller_queue = []                                   # Queue of tellers that are ready          
 teller_queue_protected = threading.Semaphore(1)     # Semaphore to protect the teller queue
@@ -42,6 +49,22 @@ def teller(tid):
         
         say(f"Teller {tid} [Customer {curr_customer[tid]}]: serving a customer") # Teller serving customer
 
+        # Teller asks customer for transaction
+        say(f"Teller {tid} [Customer {curr_customer[tid]}]: asks for transaction")
+        asking[tid].release()
+
+        # Wait for customer to give transaction
+        giving[tid].acquire()
+
+        # Teller handles and finishes transaction
+        say(f"Teller {tid} [Customer {curr_customer[tid]}]: handling {curr_transaction[tid]} transaction")
+        say(f"Teller {tid} [Customer {curr_customer[tid]}]: finishes {curr_transaction[tid]} transaction.")
+        say(f"Teller {tid} [Customer {curr_customer[tid]}]: wait for customer to leave.")
+        finishing[tid].release()
+
+        # Wait for customer to leave
+        leaving[tid].acquire()
+        
         cust_served_protected.acquire()
         cust_served = cust_served + 1               # Increment number of customers served
         last_cust = cust_served >= NUM_CUSTOMERS    # Return true if last customer
@@ -65,6 +88,22 @@ def customer(cid):
     say(f"Customer {cid} [Teller {tid}]: selects teller")       # Changed 0 to tid  
     say(f"Customer {cid} [Teller {tid}]: introduces itself")    # Customer introduces themself
     doorbells[tid].release()                                    # Customer rings the doorbell to notify the teller they've arrived
+
+    # Wait for teller to ask for a transaction
+    asking[tid].acquire()
+
+    # Customer gives transaction
+    curr_transaction[tid] = random.choice(["deposit", "withdrawal"])
+    say(f"Customer {cid} [Teller {tid}]: asks for {curr_transaction[tid]} transaction")
+    giving[tid].release()
+
+    # Wait for teller to finish
+    finishing[tid].acquire()
+
+    # Customer leaves
+    say(f"Customer {cid} [Teller {tid}]: leaves teller")
+    leaving[tid].release()
+
 
 threads = []
 for i in range(NUM_TELLERS):

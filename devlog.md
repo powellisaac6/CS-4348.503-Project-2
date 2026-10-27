@@ -134,3 +134,26 @@ I'm not quite sure how many action semaphores I'll need.
 I'll start with the asking one mentioned earlier.
 
 Again I'll test with 3 customers first, then 10, and run it multiple times to ensure it's working properly.
+
+# 10-27-2026 1:31 PM
+Everything I planned for this session is complete.
+I created 4 action lists:
+
+- Asking: Teller asks customer for transaction.
+- Giving: Customer gives teller transaction.
+- Finishing: Teller handles and finishes transaction.
+- Leaving: Customer leaves.
+
+Each list has an entry per teller.
+
+I also added a list for the type of transaction each teller is currently working on (curr_transaction).
+
+The logic to add a ready teller back to the queue was already at the beginning of the teller loop, so I ended up just adding the transaction logic after.
+This way a teller will only rejoin the queue after the customer leaves.
+
+The only real issue I ran into was that I forgot to put "import random" at the start of my code but that was a simple fix.
+
+I tested with 3 customers, then 10, and ran it multiple times.
+Everything works as intended.
+
+Next session I plan to work on the manager and safe.
