@@ -89,3 +89,26 @@ I will have to see what works best when I'm coding.
 
 I'll test with 3 customers first, then 10.
 To ensure it runs properly, I'll make sure to run it several times.
+
+# 10-26-2026 7:30 PM
+This one took me a bit longer than expected.
+I started right before class so I was only able to get about 30 minutes of focused time before quitting.
+I ended up staying at the school after class to finish my work.
+
+I implemented as planned.
+Both the doorbell and curr_customer variables were turned into lists.
+I found a solution for waking the tellers after the last customer has been served.
+Basically the teller that serves the last customer sets the closing_time variable to true.
+This teller then rings the doorbells of all of the other tellers so they can wake up.
+
+There were two issues during this session.
+I forgot to make global variables for cust_served and closing_time in the teller function.
+This led to an UnboundLocalError which caused about 10 minutes of troubleshooting.
+I eventually figured out how to handle it after doing some google searches on the error.
+
+I also forgot to add [tid] on the "serving a customer" line which caused the whole list of customers to print out on one line instead of individually.
+
+I tested with 3 customers, then 10 as I said I would.
+Works as intended.
+
+Next session, I'll work on fully implementing the handshake between customer and teller.
