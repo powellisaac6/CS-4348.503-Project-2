@@ -157,3 +157,20 @@ I tested with 3 customers, then 10, and ran it multiple times.
 Everything works as intended.
 
 Next session I plan to work on the manager and safe.
+
+# 10-27-2026 5:25 PM
+Decided to begin another session today.
+I'm going to work on the manager and safe.
+The safe will process every transaction, while the manager will approve withdrawals.
+Only 2 tellers can access the safe at a time and only one teller can access the manager at a time.
+So, I'll do semaphore(2) for the safe and semaphore(1) for the manager.
+
+For withdrawals, I think I'll have the teller release the manager before acquiring the safe.
+The idea is to avoid prolonged resource hogging from a single teller.
+
+I also need to add the random durations of sleeping for the manager and safe.
+I'm not too sure how to program this since I haven't really experimented with timers in python before. 
+I assume that there's a library that I can combine with random to implement this.
+
+I'll test with 3 customers first, then 10 and 50, and run it multiple times to ensure it's working properly.
+I also need to make sure that there aren't more than two tellers using the safe at a time.
