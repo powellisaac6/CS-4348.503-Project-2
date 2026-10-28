@@ -191,3 +191,22 @@ Everything works as intended, but it definitely runs slower now that I've added 
 
 Next session will be my final session.
 I'm planning on implementing the door and bank opening/closing.
+
+# 10-27-2026 7:52 PM
+I think I'm just going to go ahead and finish the project today since I have time.
+This will be my final session.
+
+I'm going to add the logic for the door and the bank opening/closing.
+For bank opening, I need to block customers from beginning until 3 tellers are ready.
+I'm thinking of implementing a shared count of how many tellers are ready.
+I'll protect that count with a semaphore.
+I'm not sure yet how a teller will know it's the last one to be ready before opening the bank.
+Since only 2 customers can enter through the door at a time, I'll have a Semaphore(2) for the door.
+
+The teller will print that it's leaving for the day at closing.
+The bank will then print that it's closed.
+
+The last thing I need to implement is the 0-100 ms wait after the customer picks its transaction.
+
+I'll start with 3 customers for debugging, then 50 for testing.
+Again, I'll run it multiple times to make sure it's functioning properly.
