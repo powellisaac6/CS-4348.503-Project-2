@@ -23,6 +23,11 @@ leaving = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]
 manager = threading.Semaphore(1)
 safe = threading.Semaphore(2)
 
+door = threading.Semaphore(2)
+ready_tellers = 0
+ready_tellers_protected = threading.Semaphore(1)
+bank_open = threading.Semaphore(0)
+
 teller_queue = []                                   # Queue of tellers that are ready          
 teller_queue_protected = threading.Semaphore(1)     # Semaphore to protect the teller queue
 num_ready_tellers = threading.Semaphore(0)          # Number of tellers that are ready
@@ -37,8 +42,19 @@ def say(msg):       # Print function protected by a semaphore
     print_protected.release()
 
 def teller(tid):
-    global cust_served, closing_time
+    global ready_tellers
     say(f"Teller {tid} []: ready to serve")             # Teller ready
+
+    # Three tellers must be ready before the bank opens
+    ready_tellers_protected.acquire()
+    ready_tellers = ready_tellers + 1
+    all_ready = ready_tellers >= NUM_TELLERS
+    ready_tellers_protected.release()
+
+    # Open the bank if all ready
+    if all_ready:
+        bank_open.release()
+
     for _ in range(NUM_CUSTOMERS):                      # Serve a fixed number of customers
         teller_queue_protected.acquire()                                       
         teller_queue.append(tid)                        # Add teller to the queue
@@ -49,7 +65,7 @@ def teller(tid):
 
         # Close if all customers have been served
         if closing_time:    
-            return
+            break
         
         say(f"Teller {tid} [Customer {curr_customer[tid]}]: serving a customer") # Teller serving customer
 
@@ -85,26 +101,31 @@ def teller(tid):
 
         # Wait for customer to leave
         leaving[tid].acquire()
-        
-        cust_served_protected.acquire()
-        cust_served = cust_served + 1               # Increment number of customers served
-        last_cust = cust_served >= NUM_CUSTOMERS    # Return true if last customer
 
-        if last_cust:
-            closing_time = True                     # Begin closing time
-
-        cust_served_protected.release()
-
-        if last_cust:
-            for doorbell in doorbells:
-                doorbell.release()                  # Wake each teller so the program can exit
-            return
+    say(f"Teller {tid} []: leaving for the day")
 
 def customer(cid):
+    global cust_served, closing_time
+    transaction = random.choice(["deposit", "withdrawal"])
+    say(f"Customer {cid} []: wants to perform a {transaction} transaction")
+    time.sleep(random.randint(0, 100) / 1000)
+    say(f"Customer {cid} []: going to bank.")
+
+    # Customer waits for the bank to open
+    bank_open.acquire()
+    bank_open.release()
+
+    # Customer enters the bank through the door
+    door.acquire()
+    say(f"Customer {cid} []: entering bank.")
+    door.release()
+
+    say(f"Customer {cid} []: getting in line.")
     num_ready_tellers.acquire()                                 # Take one teller from the queue if available, wait otherwise                        
     teller_queue_protected.acquire()
     tid = teller_queue.pop(0)                                   # Get the teller at the front of the queue
     teller_queue_protected.release()
+    say(f"Customer {cid} []: selecting a teller.")
     curr_customer[tid] = cid                                    # Give teller the customer ID
     say(f"Customer {cid} [Teller {tid}]: selects teller")       # Changed 0 to tid  
     say(f"Customer {cid} [Teller {tid}]: introduces itself")    # Customer introduces themself
@@ -114,16 +135,35 @@ def customer(cid):
     asking[tid].acquire()
 
     # Customer gives transaction
-    curr_transaction[tid] = random.choice(["deposit", "withdrawal"])
+    curr_transaction[tid] = transaction
     say(f"Customer {cid} [Teller {tid}]: asks for {curr_transaction[tid]} transaction")
     giving[tid].release()
 
     # Wait for teller to finish
     finishing[tid].acquire()
 
-    # Customer leaves
+    # Customer leaves teller
     say(f"Customer {cid} [Teller {tid}]: leaves teller")
     leaving[tid].release()
+
+    # Customer goes through the door to leave the bank
+    say(f"Customer {cid} []: goes to door")
+    door.acquire()
+    say(f"Customer {cid} []: leaves the bank")
+    door.release()
+
+    cust_served_protected.acquire()
+    cust_served = cust_served + 1               # Increment number of customers served
+    last_cust = cust_served >= NUM_CUSTOMERS    # Return true if last customer
+
+    if last_cust:
+        closing_time = True                     # Begin closing time
+
+    cust_served_protected.release()
+
+    if last_cust:
+        for doorbell in doorbells:
+            doorbell.release()                  # Wake each teller so the program can exit
 
 
 threads = []
@@ -135,3 +175,5 @@ for t in threads:
     t.start()       # Launch threads
 for t in threads:
     t.join()        # Program pauses until threads finish, then exits
+
+say("The bank closes for the day.")

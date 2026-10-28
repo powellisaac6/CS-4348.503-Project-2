@@ -210,3 +210,25 @@ The last thing I need to implement is the 0-100 ms wait after the customer picks
 
 I'll start with 3 customers for debugging, then 50 for testing.
 Again, I'll run it multiple times to make sure it's functioning properly.
+
+# 10-27-2026 10:23 PM
+Everything was implemented as planned.
+I used a semaphore to protect the number of ready tellers before the bank opened.
+I also used the bank_open semaphore that signals to the customer when the bank has opened.
+The bank will only open after the third ready teller releases it.
+I used Semaphore(2) for the door since only two customers can use it at a time.
+Lastly, I added the 0-100 ms wait after picking a transaction.
+
+The closing logic was moved from teller to customer.
+The last customer leaving now rings the doorbells and sets closing_time.
+This way the bank only closes after everyone leaves.
+I also added the closing print statements.
+
+One problem I ran into is the output for the code became extraordinarily long.
+I tried my best to cross-reference it with the sample output.
+Everything works as intended.
+
+To close off my thoughts, I would say the hardest part for me was understanding how semaphores worked in code.
+I wasn't too experienced with them going into this project but now I feel way more knowledgeable on the subject.
+YouTube channels like Jacob Sorber and MIT OpenCourseWare really helped my understanding.
+I think this will be useful for resource management in future projects that I do.
