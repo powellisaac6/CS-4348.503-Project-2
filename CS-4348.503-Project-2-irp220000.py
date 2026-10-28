@@ -1,10 +1,11 @@
 import threading
 import random
+import time
 
 # acquire = acquires one unit from the semaphore counter to do work, waits otherwise
 # release = releases one unit to the semaphore counter, allowing other threads to do work
 
-NUM_CUSTOMERS = 10
+NUM_CUSTOMERS = 50
 NUM_TELLERS = 3
 
 print_protected = threading.Semaphore(1)                            # Avoid print mixing by using a semaphore
@@ -18,6 +19,9 @@ asking = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]
 giving = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]
 finishing = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]
 leaving = [threading.Semaphore(0) for _ in range(NUM_TELLERS)]
+
+manager = threading.Semaphore(1)
+safe = threading.Semaphore(2)
 
 teller_queue = []                                   # Queue of tellers that are ready          
 teller_queue_protected = threading.Semaphore(1)     # Semaphore to protect the teller queue
@@ -58,6 +62,23 @@ def teller(tid):
 
         # Teller handles and finishes transaction
         say(f"Teller {tid} [Customer {curr_customer[tid]}]: handling {curr_transaction[tid]} transaction")
+
+        # Withdrawal transaction
+        if curr_transaction[tid] == "withdrawal":
+            say(f"Teller {tid} [Customer {curr_customer[tid]}]: going to the manager")          # Teller acquires manager
+            manager.acquire()
+            say(f"Teller {tid} [Customer {curr_customer[tid]}]: getting manager's permission")  # Teller asks manager for permission
+            time.sleep(random.randint(5, 30) / 1000)                                            # Teller sleeps for 5-30 ms
+            say(f"Teller {tid} [Customer {curr_customer[tid]}]: got manager's permission")      # Teller releases manager
+            manager.release()
+
+        say(f"Teller {tid} [Customer {curr_customer[tid]}]: going to safe") # Teller acquires safe
+        safe.acquire()
+        say(f"Teller {tid} [Customer {curr_customer[tid]}]: enter safe")    # Teller enters safe
+        time.sleep(random.randint(10, 50) / 1000)                           # Teller sleeps for 10-50 ms      
+        say(f"Teller {tid} [Customer {curr_customer[tid]}]: leaving safe")  # Teller releases safe
+        safe.release()
+
         say(f"Teller {tid} [Customer {curr_customer[tid]}]: finishes {curr_transaction[tid]} transaction.")
         say(f"Teller {tid} [Customer {curr_customer[tid]}]: wait for customer to leave.")
         finishing[tid].release()

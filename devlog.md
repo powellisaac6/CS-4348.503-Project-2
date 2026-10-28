@@ -174,3 +174,20 @@ I assume that there's a library that I can combine with random to implement this
 
 I'll test with 3 customers first, then 10 and 50, and run it multiple times to ensure it's working properly.
 I also need to make sure that there aren't more than two tellers using the safe at a time.
+
+# 10-27-2026 7:23 PM
+I implemented everything as intended.
+The safe was created using Semaphore(2) and the manager was created using Semaphore(1).
+The manager approves every withdrawal and each transaction runs through the safe.
+
+As predicted, the timer was implemented using a combination of the time and random libraries.
+I did accidentally forget to divide by 1000 when I originally wrote the code which led to long wait times.
+Overall, it wasn't too difficult to figure out though.
+A few quick google searches helped me understand how to implement and troubleshoot this.
+
+I tested with 3 customers, then 10 and 50, and ran it multiple times.
+I also checked to make sure no more than 2 tellers were accessing the safe at a time.
+Everything works as intended, but it definitely runs slower now that I've added the random sleeps.
+
+Next session will be my final session.
+I'm planning on implementing the door and bank opening/closing.
